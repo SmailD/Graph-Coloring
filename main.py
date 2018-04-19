@@ -53,7 +53,7 @@ class Subset(object):
     
 
 class Graph(object):
-    colors = ['RED', 'BLUE', 'GREEN', 'YELLOW', 'BLACK', 'PINK']
+    colors = ['RED', 'BLUE', 'GREEN', 'YELLOW']
     nodes = []
     node_to_remove = []
     def __init__(self, source):
@@ -68,8 +68,8 @@ class Graph(object):
                 self.sets.append(sub_set)
 
     def solve(self):
-        i = 0
-        while i < 6:           
+        i = 0         
+        while i < 4:           
             for subset in self.sets:
                 node_max = subset.node_with_max_value()
                 if isinstance(node_max, Node) == False:
@@ -79,7 +79,16 @@ class Graph(object):
                         node_max.set_color(self.colors[i])
                         if node_max not in self.nodes:
                             self.nodes.append(node_max)
-                            self.node_to_remove.append(node_max)  
+                            self.node_to_remove.append(node_max)
+            for subset in self.sets[:]:
+                indice = False            
+                for node in subset.nodes:
+                    if node.color != None:
+                        indice = True
+                if indice == False:
+                    subset.nodes[0].set_color(self.colors[i])
+                    self.nodes.append(subset.nodes[0])
+                    self.node_to_remove.append(subset.nodes[0])
             self.clear_graph()
             i = i + 1
 
@@ -97,14 +106,19 @@ class Graph(object):
             self.remove_node_from_all_subsets(n)
 
 def main():
-    
-    graph = Graph('regions_france.txt')
-    graph.solve()
-
+    loop = True
+    while loop:
+        graph = Graph('regions_france.txt')
+        graph.solve()
+        if graph.count == len(graph.nodes):
+            loop = False  
+        else:
+            del graph
+        
     for n in graph.nodes:
-        print "{} ===========================> {}".format(n.name, n.color)
+        print "[{}]  {}".format(n.color, n.name)
 
-    print "Nodes colored :"+str(len(graph.nodes))
+    print "\nNodes colored :"+str(len(graph.nodes))
 
 if __name__ == '__main__':
     main()
