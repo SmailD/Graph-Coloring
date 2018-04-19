@@ -53,7 +53,7 @@ class Subset(object):
     
 
 class Graph(object):
-    colors = ['RED', 'BLUE', 'GREEN', 'YELLOW']
+    colors = ['RED', 'BLUE', 'GREEN', 'YELLOW', 'PINK', 'ORANGE']
     nodes = []
     node_to_remove = []
     def __init__(self, source):
@@ -69,28 +69,33 @@ class Graph(object):
 
     def solve(self):
         i = 0         
-        while i < 4:           
+        while len(self.nodes) < self.count : 
             for subset in self.sets:
                 node_max = subset.node_with_max_value()
-                if isinstance(node_max, Node) == False:
-                    continue;  
-                else:
-                    if node_max.name == subset.nodes[0].name:
-                        node_max.set_color(self.colors[i])
-                        if node_max not in self.nodes:
-                            self.nodes.append(node_max)
-                            self.node_to_remove.append(node_max)
-            for subset in self.sets[:]:
-                indice = False            
-                for node in subset.nodes:
-                    if node.color != None:
-                        indice = True
-                if indice == False:
-                    subset.nodes[0].set_color(self.colors[i])
-                    self.nodes.append(subset.nodes[0])
-                    self.node_to_remove.append(subset.nodes[0])
+                #if isinstance(node_max, Node) == False:
+                #    continue;  
+                #else:
+                if node_max.name == subset.nodes[0].name:
+                    node_max.set_color(self.colors[i])
+                    if node_max not in self.nodes:
+                        self.nodes.append(node_max)
+                        self.node_to_remove.append(node_max)
+            self.color_non_adjacent_nodes_left(self.colors[i])
             self.clear_graph()
             i = i + 1
+        self.number_of_color_used = i
+        self.output_result()
+
+    def color_non_adjacent_nodes_left(self, color):
+        for subset in self.sets[:]:
+            indice = False            
+            for node in subset.nodes:
+                if node.color != None:
+                    indice = True
+            if indice == False:
+                subset.nodes[0].set_color(color)
+                self.nodes.append(subset.nodes[0])
+                self.node_to_remove.append(subset.nodes[0])
 
     def remove_node_from_all_subsets(self, _node):
         for subset in self.sets[:]:
@@ -104,21 +109,13 @@ class Graph(object):
                 if subset.name == n.name:
                     self.sets.remove(subset)
             self.remove_node_from_all_subsets(n)
+    
+    def output_result(self):
+        for n in self.nodes:
+            print "[{}]  {}".format(n.color, n.name)
 
-def main():
-    loop = True
-    while loop:
-        graph = Graph('regions_france.txt')
-        graph.solve()
-        if graph.count == len(graph.nodes):
-            loop = False  
-        else:
-            del graph
-        
-    for n in graph.nodes:
-        print "[{}]  {}".format(n.color, n.name)
-
-    print "\nNodes colored :"+str(len(graph.nodes))
+        print "\nNodes colored :{}\nNumber of color used : {}".format(str(len(self.nodes)), self.number_of_color_used)
 
 if __name__ == '__main__':
-    main()
+    graph = Graph('regions_france.txt')
+    graph.solve()
